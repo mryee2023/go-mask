@@ -2332,3 +2332,37 @@ func TestCNMask(t *testing.T) {
 	assert.Equalf(t, `{"name":"文**","mobile":"138****8000","identity":"340404****092377","age":10}`, string(b), "json_mask")
 
 }
+
+func PrintThis[T any](v []T) {
+	for _, t := range v {
+		fmt.Println(reflect.TypeOf(t), t)
+	}
+}
+
+type Phone string
+
+type AnyString interface {
+	~string
+}
+
+func Desensitization[T AnyString](str T) string {
+	var newStr string
+	if len(str) > 4 {
+		newStr = string(str[0:4]) + "****"
+	} else {
+		newStr = string(str)
+	}
+	return newStr
+}
+
+func TestGen(t *testing.T) {
+	sss := []string{"a", "b", "c"}
+	vvv := []int{1, 2, 3}
+	PrintThis(sss)
+	PrintThis(vvv)
+
+	myPhone := Phone("123456789")
+	v := Desensitization(myPhone)
+	fmt.Println(v)
+
+}
