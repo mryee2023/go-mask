@@ -2347,8 +2347,8 @@ type AnyString interface {
 
 func Desensitization[T AnyString](str T) string {
 	var newStr string
-	if len(str) > 4 {
-		newStr = string(str[0:4]) + "****"
+	if len(str) == 11 {
+		newStr = string(str[0:3]) + "****" + string(str[7:11])
 	} else {
 		newStr = string(str)
 	}
@@ -2361,7 +2361,7 @@ func TestGen(t *testing.T) {
 	PrintThis(sss)
 	PrintThis(vvv)
 
-	myPhone := Phone("123456789")
+	myPhone := Phone("13800138000")
 	v := Desensitization(myPhone)
 	fmt.Println(v)
 
