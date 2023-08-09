@@ -1,6 +1,7 @@
 package mask
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"math/rand"
@@ -2300,4 +2301,24 @@ func newMasker() *Masker {
 	m.RegisterMaskFloat64Func(MaskTypeRandom, m.MaskRandomFloat64)
 	m.RegisterMaskAnyFunc(MaskTypeZero, m.MaskZero)
 	return m
+}
+
+func TestCNMask(t *testing.T) {
+	user := struct {
+		Name   string `mask:"name",json:"name"`
+		Mobile string `mask:"mobile",json:"mobile"`
+		Id     string `mask:"identity",json:"identity"`
+	}{
+		Name:   "Yi Xiao",
+		Mobile: "13800138000",
+		Id:     "340404199202092377",
+	}
+	maskUser, err := Mask(user)
+	assert.NoError(t, err)
+	assert.Equalf(t, "Yi Xiao", maskUser.Name, "name")
+	assert.Equalf(t, "138****8000", maskUser.Mobile, "mobile")
+	assert.Equalf(t, "340404****092377", maskUser.Id, "identity")
+	b, e := json.Marshal(maskUser)
+	assert.NoErrorf(t, e, "json")
+	assert.Equalf(t, `{"Name":"Yi Xiao","Mobile":"138****8000","Id":"340404****092377"}`, string(b), "json")
 }

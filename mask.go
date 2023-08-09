@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"math"
 	"math/rand"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -21,6 +22,8 @@ func init() {
 	defaultMasker.RegisterMaskIntFunc(MaskTypeRandom, defaultMasker.MaskRandomInt)
 	defaultMasker.RegisterMaskFloat64Func(MaskTypeRandom, defaultMasker.MaskRandomFloat64)
 	defaultMasker.RegisterMaskAnyFunc(MaskTypeZero, defaultMasker.MaskZero)
+	defaultMasker.RegisterMaskStringFunc(MaskTypeCNMobile, defaultMasker.MaskCNMobile)
+	defaultMasker.RegisterMaskStringFunc(MaskTypeCNIdentity, defaultMasker.MaskCNIdentity)
 }
 
 // Tag name of the field in the structure when masking
@@ -30,11 +33,13 @@ const maskChar = "*"
 
 // Default tag that can be specified as a mask
 const (
-	MaskTypeFilled = "filled"
-	MaskTypeFixed  = "fixed"
-	MaskTypeRandom = "random"
-	MaskTypeHash   = "hash"
-	MaskTypeZero   = "zero"
+	MaskTypeFilled     = "filled"
+	MaskTypeFixed      = "fixed"
+	MaskTypeRandom     = "random"
+	MaskTypeHash       = "hash"
+	MaskTypeZero       = "zero"
+	MaskTypeCNMobile   = "mobile"
+	MaskTypeCNIdentity = "identity"
 )
 
 var defaultMasker *Masker
@@ -377,6 +382,28 @@ func (m *Masker) MaskFilledString(arg, value string) (string, error) {
 	}
 
 	return strings.Repeat(m.MaskChar(), utf8.RuneCountInString(value)), nil
+}
+
+func (m *Masker) MaskCNIdentity(arg, value string) (string, error) {
+	regRuler := "(^\\d{15}$)|(^\\d{18}$)|(^\\d{17}(\\d|X|x)$)"
+
+	reg := regexp.MustCompile(regRuler)
+	if reg.MatchString(value) {
+		return value[:6] + "****" + value[12:], nil
+	}
+
+	return value, nil
+}
+
+func (m *Masker) MaskCNMobile(arg, value string) (string, error) {
+
+	regRuler := "^1[345789]{1}\\d{9}$"
+	reg := regexp.MustCompile(regRuler)
+	if reg.MatchString(value) {
+		return value[:3] + "****" + value[7:], nil
+	}
+
+	return value, nil
 }
 
 // MaskFixedString masks with a fixed length (8 characters).
