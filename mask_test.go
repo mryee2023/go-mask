@@ -2303,26 +2303,32 @@ func newMasker() *Masker {
 	return m
 }
 
+type U struct {
+	Name   string `mask:"name" json:"name"`
+	Mobile string `mask:"mobile" json:"mobile"`
+	Id     string `mask:"identity" json:"identity"`
+	Age    int    `mask:"age" json:"age"`
+}
+
 func TestCNMask(t *testing.T) {
 	// test china mobile & identity no mask
-	user := struct {
-		Name   string `mask:"name",json:"name"`
-		Mobile string `mask:"mobile",json:"mobile"`
-		Id     string `mask:"identity",json:"identity"`
-	}{
+	user := U{
 		Name:   "文天祥",
 		Mobile: "13800138000",
 		Id:     "340404199202092377",
+		Age:    10,
 	}
 	maskUser, err := Mask(user)
 	assert.NoError(t, err)
 	assert.Equalf(t, "文**", maskUser.Name, "name")
 	assert.Equalf(t, "138****8000", maskUser.Mobile, "mobile")
 	assert.Equalf(t, "340404****092377", maskUser.Id, "identity")
-	b, e := json.Marshal(maskUser)
-	assert.NoErrorf(t, e, "json")
-	assert.Equalf(t, `{"Name":"文**","Mobile":"138****8000","Id":"340404****092377"}`, string(b), "json")
 
-	fmt.Println(string(b))
+	b, e := json.Marshal(user)
+	assert.NoErrorf(t, e, "json")
+	assert.Equalf(t, `{"name":"文天祥","mobile":"13800138000","identity":"340404199202092377","age":10}`, string(b), "json_struct")
+	b, e = json.Marshal(maskUser)
+
+	assert.Equalf(t, `{"name":"文**","mobile":"138****8000","identity":"340404****092377","age":10}`, string(b), "json_mask")
 
 }
