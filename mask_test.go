@@ -2304,6 +2304,7 @@ func newMasker() *Masker {
 }
 
 func TestCNMask(t *testing.T) {
+	// test china mobile & identity no mask
 	user := struct {
 		Name   string `mask:"name",json:"name"`
 		Mobile string `mask:"mobile",json:"mobile"`
