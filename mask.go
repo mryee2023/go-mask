@@ -24,6 +24,7 @@ func init() {
 	defaultMasker.RegisterMaskAnyFunc(MaskTypeZero, defaultMasker.MaskZero)
 	defaultMasker.RegisterMaskStringFunc(MaskTypeCNMobile, defaultMasker.MaskCNMobile)
 	defaultMasker.RegisterMaskStringFunc(MaskTypeCNIdentity, defaultMasker.MaskCNIdentity)
+	defaultMasker.RegisterMaskStringFunc(MaskTypeCNName, defaultMasker.MaskCNFullName)
 }
 
 // Tag name of the field in the structure when masking
@@ -40,6 +41,7 @@ const (
 	MaskTypeZero       = "zero"
 	MaskTypeCNMobile   = "mobile"
 	MaskTypeCNIdentity = "identity"
+	MaskTypeCNName     = "name"
 )
 
 var defaultMasker *Masker
@@ -404,6 +406,14 @@ func (m *Masker) MaskCNMobile(arg, value string) (string, error) {
 	}
 
 	return value, nil
+}
+
+func (m *Masker) MaskCNFullName(arg, value string) (string, error) {
+	runes := []rune(value)
+	if len(runes) <= 1 {
+		return value, nil
+	}
+	return string(runes[0:1]) + strings.Repeat("*", len(runes)-1), nil
 }
 
 // MaskFixedString masks with a fixed length (8 characters).

@@ -2310,16 +2310,19 @@ func TestCNMask(t *testing.T) {
 		Mobile string `mask:"mobile",json:"mobile"`
 		Id     string `mask:"identity",json:"identity"`
 	}{
-		Name:   "Yi Xiao",
+		Name:   "文天祥",
 		Mobile: "13800138000",
 		Id:     "340404199202092377",
 	}
 	maskUser, err := Mask(user)
 	assert.NoError(t, err)
-	assert.Equalf(t, "Yi Xiao", maskUser.Name, "name")
+	assert.Equalf(t, "文**", maskUser.Name, "name")
 	assert.Equalf(t, "138****8000", maskUser.Mobile, "mobile")
 	assert.Equalf(t, "340404****092377", maskUser.Id, "identity")
 	b, e := json.Marshal(maskUser)
 	assert.NoErrorf(t, e, "json")
-	assert.Equalf(t, `{"Name":"Yi Xiao","Mobile":"138****8000","Id":"340404****092377"}`, string(b), "json")
+	assert.Equalf(t, `{"Name":"文**","Mobile":"138****8000","Id":"340404****092377"}`, string(b), "json")
+
+	fmt.Println(string(b))
+
 }
