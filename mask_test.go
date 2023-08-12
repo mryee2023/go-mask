@@ -1,6 +1,7 @@
 package mask
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"math/rand"
@@ -2310,6 +2311,25 @@ type U struct {
 	Age    int    `mask:"age" json:"age"`
 }
 
+func (u U) String() string {
+	v, _ := Mask(u)
+	b, _ := json.Marshal(v)
+	return string(b)
+}
+
+func TestUString(t *testing.T) {
+	user := U{
+		Name:   "文天祥",
+		Mobile: "13800138000",
+		Id:     "340404199202092377",
+		Email:  "wentaixia@qq.com",
+		Age:    10,
+	}
+	fmt.Println(user)
+	b, _ := json.Marshal(user)
+	fmt.Println(string(b))
+}
+
 func TestCNMask(t *testing.T) {
 	// test china mobile & identity no mask
 	user := U{
@@ -2326,4 +2346,5 @@ func TestCNMask(t *testing.T) {
 	assert.Equalf(t, "340404****092377", maskUser.Id, "identity")
 	assert.Equalf(t, "****@qq.com", maskUser.Email, "email")
 	assert.Equalf(t, 10, maskUser.Age, "age")
+
 }
