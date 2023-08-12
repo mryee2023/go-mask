@@ -25,6 +25,8 @@ func init() {
 	defaultMasker.RegisterMaskStringFunc(MaskTypeCNMobile, defaultMasker.MaskCNMobile)
 	defaultMasker.RegisterMaskStringFunc(MaskTypeCNIdentity, defaultMasker.MaskCNIdentity)
 	defaultMasker.RegisterMaskStringFunc(MaskTypeCNName, defaultMasker.MaskCNFullName)
+	defaultMasker.RegisterMaskStringFunc(MaskTypeEmail, defaultMasker.MaskEmail)
+
 }
 
 // Tag name of the field in the structure when masking
@@ -42,6 +44,7 @@ const (
 	MaskTypeCNMobile   = "mobile"
 	MaskTypeCNIdentity = "identity"
 	MaskTypeCNName     = "name"
+	MaskTypeEmail      = "email"
 )
 
 var defaultMasker *Masker
@@ -384,6 +387,16 @@ func (m *Masker) MaskFilledString(arg, value string) (string, error) {
 	}
 
 	return strings.Repeat(m.MaskChar(), utf8.RuneCountInString(value)), nil
+}
+
+func (m *Masker) MaskEmail(arg, value string) (string, error) {
+	regRule := "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$"
+	reg := regexp.MustCompile(regRule)
+	if !reg.MatchString(value) {
+		return value, nil
+	}
+	index := strings.Index(value, "@")
+	return "****@" + value[index+1:], nil
 }
 
 func (m *Masker) MaskCNIdentity(arg, value string) (string, error) {

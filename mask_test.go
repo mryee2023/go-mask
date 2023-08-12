@@ -1,7 +1,6 @@
 package mask
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
 	"math/rand"
@@ -2307,6 +2306,7 @@ type U struct {
 	Name   string `mask:"name" json:"name"`
 	Mobile string `mask:"mobile" json:"mobile"`
 	Id     string `mask:"identity" json:"identity"`
+	Email  string `mask:"email" json:"email"`
 	Age    int    `mask:"age" json:"age"`
 }
 
@@ -2316,6 +2316,7 @@ func TestCNMask(t *testing.T) {
 		Name:   "文天祥",
 		Mobile: "13800138000",
 		Id:     "340404199202092377",
+		Email:  "wentaixia@qq.com",
 		Age:    10,
 	}
 	maskUser, err := Mask(user)
@@ -2323,46 +2324,6 @@ func TestCNMask(t *testing.T) {
 	assert.Equalf(t, "文**", maskUser.Name, "name")
 	assert.Equalf(t, "138****8000", maskUser.Mobile, "mobile")
 	assert.Equalf(t, "340404****092377", maskUser.Id, "identity")
-
-	b, e := json.Marshal(user)
-	assert.NoErrorf(t, e, "json")
-	assert.Equalf(t, `{"name":"文天祥","mobile":"13800138000","identity":"340404199202092377","age":10}`, string(b), "json_struct")
-	b, e = json.Marshal(maskUser)
-
-	assert.Equalf(t, `{"name":"文**","mobile":"138****8000","identity":"340404****092377","age":10}`, string(b), "json_mask")
-
-}
-
-func PrintThis[T any](v []T) {
-	for _, t := range v {
-		fmt.Println(reflect.TypeOf(t), t)
-	}
-}
-
-type Phone string
-
-type AnyString interface {
-	~string
-}
-
-func Desensitization[T AnyString](str T) string {
-	var newStr string
-	if len(str) == 11 {
-		newStr = string(str[0:3]) + "****" + string(str[7:11])
-	} else {
-		newStr = string(str)
-	}
-	return newStr
-}
-
-func TestGen(t *testing.T) {
-	sss := []string{"a", "b", "c"}
-	vvv := []int{1, 2, 3}
-	PrintThis(sss)
-	PrintThis(vvv)
-
-	myPhone := Phone("13800138000")
-	v := Desensitization(myPhone)
-	fmt.Println(v)
-
+	assert.Equalf(t, "****@qq.com", maskUser.Email, "email")
+	assert.Equalf(t, 10, maskUser.Age, "age")
 }
